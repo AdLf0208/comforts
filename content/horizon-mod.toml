@@ -1,0 +1,11 @@
+# Comforts' sleeping bag as Horizon content: one bed-shaped block (and its
+# item) on the vanilla white bed template. Sleep behaviour lives in the native
+# bundle beside this folder; this half is the block, model, recipe and lang.
+# Licence: LGPL-3.0-or-later — local-only until the maintainer approves
+# publishing.
+id = "comforts"
+name = "Comforts"
+version = "0.1.0"
+api = "0.2"
+side = "both"
+capabilities = ["registries"]

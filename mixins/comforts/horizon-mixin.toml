@@ -1,0 +1,173 @@
+[mod]
+id = "comforts"
+version = "0.1.0"
+priority = 100
+
+[compatibility]
+horizon_revision = "1d63e0a5a37a7a708eb0b32b49bf0dfeb28ed8a9"
+
+# The pure sleep rules (standalone crate lib, injected as
+# `crate::game::comforts`).
+[[module]]
+id = "runtime"
+file = "crates/horizon-client/src/game.rs"
+name = "comforts"
+source = "runtime.rs"
+
+# Game-side glue: the config, the per-sleeper record and the hook effects.
+[[module]]
+id = "state"
+file = "crates/horizon-client/src/game.rs"
+name = "comforts_state"
+source = "support.rs"
+
+# The content half is inside this bundle (`data/comforts-content.hmod`, the
+# built `content/comforts.hmod`): this writes it to `.horizon-cache/` and
+# appends it to the dev-mod list, so one `.hnmod` installs the block and the
+# code. The registry keeps one file per project, so a split port could not be
+# listed; AE2 and Charging Gadgets ship the same pattern.
+[[injection]]
+id = "embedded-content"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::mods::content_root"
+helper = "embedded_content.rs"
+bindings = [
+  { name = "root", ty = "&std::path::Path", value = "root" },
+  { name = "enabled", ty = "&std::collections::BTreeSet<String>", value = "enabled" },
+  { name = "dev", ty = "&[std::path::PathBuf]", value = "dev" },
+]
+
+# The server config: written from upstream's defaults when missing.
+[[injection]]
+id = "register-configs"
+hook = "register_configs"
+hook_version = 1
+kind = "HEAD"
+helper = "register_configs.rs"
+bindings = [
+  { name = "configs", ty = "&mut Vec<NativeConfig>", value = "configs" },
+]
+
+# The config was read: keep the parsed rules.
+[[injection]]
+id = "config-loading"
+hook = "config_loading"
+hook_version = 1
+kind = "HEAD"
+helper = "config_loading.rs"
+bindings = [
+  { name = "config", ty = "&NativeConfigFile", value = "config" },
+]
+
+# The file changed on disk: apply it without a restart.
+[[injection]]
+id = "config-reloading"
+hook = "config_reloading"
+hook_version = 1
+kind = "HEAD"
+helper = "config_reloading.rs"
+bindings = [
+  { name = "config", ty = "&NativeConfigFile", value = "config" },
+]
+
+# The server stopped: drop the config and its sleepers.
+[[injection]]
+id = "config-unloading"
+hook = "config_unloading"
+hook_version = 1
+kind = "HEAD"
+helper = "config_unloading.rs"
+bindings = [
+  { name = "config", ty = "&NativeConfigFile", value = "config" },
+]
+
+# Vanilla found the first sleep problem: the bag's time window may clear or
+# replace it (`ComfortsEvents.checkTime`), and `restrictSleeping` may refuse.
+[[injection]]
+id = "can-player-sleep"
+hook = "can_player_sleep"
+hook_version = 1
+kind = "HEAD"
+helper = "sleep_check.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "u128", value = "player" },
+  { name = "name", ty = "&str", value = "name" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "problem", ty = "&mut Option<String>", value = "problem" },
+]
+
+# The checks passed and the player is entering the bed: remember the sleeper.
+[[injection]]
+id = "bed-enter"
+hook = "player_bed_enter"
+hook_version = 1
+kind = "HEAD"
+helper = "bed_enter.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "u128", value = "player" },
+  { name = "name", ty = "&str", value = "name" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "cancel", ty = "&mut bool", value = "cancel" },
+]
+
+# The player woke: the bag may break, and the phantom rest is put back when
+# `sleepingBagsStopPhantoms` is off.
+[[injection]]
+id = "bed-leave"
+hook = "player_bed_leave"
+hook_version = 1
+kind = "HEAD"
+helper = "bed_leave.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "u128", value = "player" },
+  { name = "name", ty = "&str", value = "name" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+]
+
+# 100 ticks asleep: `sleepingBagsStopPhantoms=false` restores the time since
+# rest the game reset when the sleep began.
+[[injection]]
+id = "deep-sleep"
+hook = "player_deep_sleep"
+hook_version = 1
+kind = "HEAD"
+helper = "deep_sleep.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "u128", value = "player" },
+  { name = "name", ty = "&str", value = "name" },
+]
+
+# A bed put the player's respawn point here: cancel it for a sleeping bag.
+[[injection]]
+id = "spawn-point"
+hook = "player_spawn_point_set"
+hook_version = 1
+kind = "HEAD"
+helper = "spawn_point.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "u128", value = "player" },
+  { name = "name", ty = "&str", value = "name" },
+  { name = "dimension", ty = "&str", value = "dimension" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "cause", ty = "&str", value = "cause" },
+  { name = "cancel", ty = "&mut bool", value = "cancel" },
+]
+
+# Enough players slept: the wake time gets upstream's day/night offsets.
+[[injection]]
+id = "sleep-finished"
+hook = "sleep_finished_time"
+hook_version = 1
+kind = "HEAD"
+helper = "sleep_finished.rs"
+bindings = [
+  { name = "dimension", ty = "&str", value = "dimension" },
+  { name = "current", ty = "i64", value = "current" },
+  { name = "new_time", ty = "&mut i64", value = "new_time" },
+]

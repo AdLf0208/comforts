@@ -1,0 +1,19 @@
+[package]
+name = "horizon-comforts"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "LGPL-3.0-or-later"
+description = "Comforts for Horizon: a sleeping bag that sleeps through the night without setting the spawn point"
+
+[lib]
+# Ported from Comforts (mod id `comforts`, LGPL-3.0-or-later), Minecraft Java
+# 1.21.1 NeoForge. Local-only port, never published without the maintainer's
+# approval.
+
+# This exact source is also injected as a same-crate module by horizon-mixins.
+path = "mixins/comforts/runtime.rs"
+
+[workspace]
+members = ["tools/audit"]
+resolver = "2"
