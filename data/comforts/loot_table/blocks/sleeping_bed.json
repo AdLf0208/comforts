@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "comforts:sleeping_bed",
+            "state": {
+              "part": "head"
+            }
+          },
+          "name": "comforts:sleeping_bed"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "comforts:blocks/sleeping_bed"
+}

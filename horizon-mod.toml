@@ -1,0 +1,23 @@
+id = "comforts"
+name = "Comforts"
+version = "0.2.0"
+description = """Comforts' sleeping bag for Horizon: a bed-shaped block that sleeps through the night
+and never sets the player's respawn point, with upstream's server config for the time window, the
+wake-time offsets, restrictSleeping, the phantom-rest restore and the break chance. One plain white
+bag is carried; the other dyed bags, the hammocks and the auto-use sleeping-bag item are not."""
+authors = ["Illusive Soulworks", "AdLf0208"]
+# A native mod: Rust in src/, compiled by the launcher against the game build [native] pins,
+# beside data/ and assets/. The id is the resource namespace and the only identity: Cargo's
+# package name and version are not the mod's.
+api = "0.2"
+# "both" is the installation side, not the hook's: an integrated server belongs to the client
+# installation, so a LAN host or a single-player world needs both.
+side = "both"
+# The one shared value every manifest carries ("May add blocks, items, mob effects and entity
+# types"); this mod declares comforts:sleeping_bed under data/comforts/horizon/block/.
+capabilities = ["registries"]
+
+[native]
+game = "26.3"
+horizon = "0b14f8acfd97fa2c750e42795249dcc981178ca4"
+mixins = "e59da9094f0c2fdda6c627fe9eff22dec6a906f0"

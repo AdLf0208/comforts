@@ -1,0 +1,7 @@
+{
+  "block.comforts.sleeping_bed": "Sleeping Bag",
+  "item.comforts.sleeping_bed": "Sleeping Bag",
+  "itemGroup.comforts": "Comforts",
+  "block.comforts.sleeping_bag.broke": "Your sleeping bag broke",
+  "capability.comforts.not_sleepy": "You are not sleepy yet"
+}

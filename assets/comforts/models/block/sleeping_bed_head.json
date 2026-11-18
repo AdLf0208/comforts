@@ -1,0 +1,33 @@
+{
+  "textures": {
+    "particle": "minecraft:block/white_wool",
+    "bed": "minecraft:block/white_wool",
+    "pillow": "minecraft:block/white_terracotta"
+  },
+  "elements": [
+    {
+      "from": [0.0, 0.0, 0.0],
+      "to": [16.0, 3.0, 16.0],
+      "faces": {
+        "down": { "texture": "#bed", "cullface": "down" },
+        "up": { "texture": "#bed" },
+        "north": { "texture": "#bed" },
+        "south": { "texture": "#bed" },
+        "west": { "texture": "#bed" },
+        "east": { "texture": "#bed" }
+      }
+    },
+    {
+      "from": [1.0, 3.0, 1.0],
+      "to": [15.0, 5.0, 6.0],
+      "faces": {
+        "down": { "texture": "#pillow" },
+        "up": { "texture": "#pillow" },
+        "north": { "texture": "#pillow" },
+        "south": { "texture": "#pillow" },
+        "west": { "texture": "#pillow" },
+        "east": { "texture": "#pillow" }
+      }
+    }
+  ]
+}
