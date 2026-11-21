@@ -592,3 +592,46 @@ Skills: superpowers/using-superpowers,brainstorming,writing-plans,test-driven-de
 > time window, the wake offsets, `restrictSleeping`, the phantom restore and the break chance
 > behave exactly as before. Built against SDK `0b14f8a` / mixins `e59da90` for 26.3; the in-game
 > leg still needs a launcher-built game (no `horizon-launcher` here) and is the one recorded gap.
+
+## 26.3 dialect sweep (2026-11-21) — carried recipes and loot tables, proven in game (0.2.1)
+
+The shared checker `ports/tools/check_261_dialect.py` (generalised from `ports/modularrouters/tools/data_shape.py`
+and `ports/createaddition/tools/data_shape.py`) found the 1.21.1 forms still in the package that had shipped
+at **0.2.0**; `cargo horizon-mod check`, `fits` and every unit test had passed on them, and the content
+was dead in game (a recipe returns nothing; a block drops empty).
+
+| Family | Files | 1.21.1 form that shipped | 26.3 form |
+|---|---|---|---|
+| recipe ingredients | 1 (`sleeping_bed`): `{"item": "minecraft:white_wool"}` in `key` | `{"item": "…"}` / `{"tag": "…"}` | `"minecraft:…"` / `"#c:…"` |
+| loot pools | none (already in the 26.3 form, including the head-only entry condition) | `"conditions": [ … ]`, `bonus_rolls`, `"rolls": 1.0` | one `"condition": {"type": "minecraft:…"}`, no `bonus_rolls`, `"rolls": 1` |
+
+The loot phase reports n/a; the bag's table was already correct and is untouched.
+
+**Red, kept:** `ports/_shared/evidence/comforts/dialect-check-red.log` — the checker exits 1 on the pre-fix
+package itself (`dialect-prefix-0.2.0.hmod`, 0.2.0, kept in the same folder), naming every file.
+A reconstructed fixture carrying all three loot shapes plus a `requires_tool` block with no mineable tag is
+red too (`../../morered/dialect-check-fixture-red.log`). The checker's `--selftest` fails when any shape is
+accepted.
+
+  `recipe sleeping_bed.json: crafting_shaped -> {"count": 1, "item": "comforts:sleeping_bed", "slot": 200}`; `the result reached the inventory (1 comforts:sleeping_bed), the grid emptied, and minecraft:white_wool was consumed`
+
+  `n/a: this port's loot tables were already in the 26.3 form`
+
+The in-game leg is `tools/e2e-dialect.sh` (`ports/_shared/evidence/comforts/e2e-dialect.log`): `PASS` + `EXIT:0`,
+and `SELFTEST=1` inverts the expectation and ends `FAIL` + `EXIT:1` (`e2e-dialect-selftest.log`).
+`check-e2e-logs.py comforts --strict` exits 0.
+
+**Ladder** (all in `build-slot.sh` leases, `CARGO_INCREMENTAL=0`, `BUILD_LOCAL=1`):
+
+| Step | Command | Result |
+|---|---|---|
+| tests | `cargo test --offline` | **23 passed**, 0 failed (`dialect-test.log`) |
+| package | `rm -f Cargo.lock && cargo horizon-mod build` (twice) | built against **0a875da** (re-pinned from 0b14f8a), second build `cmp`-identical (`dialect-build-1.log`, `dialect-build-2.log`) |
+| registry check | `cargo horizon-mod check comforts.hmod` | `comforts 0.2.1 (native-mod, format native-1/0a875da…/e59da90…, for 26.3)`, **39,557 B**, sha256 `1bec3751abbd…` (`dialect-check.log`) |
+| fits the pin | `cargo horizon-mod fits comforts.hmod --build 0a875da` | `0a875da  made for`, exit 0 (`dialect-fits-0a875da.log`) |
+| fits the previous build | `… --build 0b14f8a` | `does not fit`, exit 1 (`dialect-fits-0b14f8a.log`) |
+| the gate | `python3 ports/tools/verify-sdk-package.py comforts` | **1/1** (`dialect-gate.log`) |
+
+Package 0.2.1: **39,557 B**, SHA-256 `1bec3751abbdd259ada3e9cc10f1f02b1618209cd971e50b6c5a9e9293196bb9`.
+
+Skills: superpowers/using-superpowers,systematic-debugging,test-driven-development,verification-before-completion; BeautifulRust/none (no Rust change)

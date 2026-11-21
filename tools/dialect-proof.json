@@ -1,0 +1,10 @@
+{
+  "recipe": {
+    "file": "data/comforts/recipe/sleeping_bed.json",
+    "expect": {
+      "id": "comforts:sleeping_bed",
+      "count": 1
+    },
+    "consume": "minecraft:white_wool"
+  }
+}

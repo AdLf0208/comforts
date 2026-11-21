@@ -93,3 +93,17 @@ EXIT:0
   fixtures (one `break_block` injection); this bundle has had 10+ injections
   since slice 1, so they are not this port's ladder and are not claimed as
   passing.
+
+## 26.3 dialect sweep (2026-11-21) — 0.2.1
+
+| Check | Command | Result |
+|---|---|---|
+| static dialect | `python3 ports/tools/check_261_dialect.py comforts.hmod` | exit 0; pre-fix package exit 1 (`../_shared/evidence/comforts/dialect-check-red.log`) |
+| tests | `cargo test --offline` | exit 0 (`dialect-test.log`) |
+| package | `cargo horizon-mod build` twice after `rm -f Cargo.lock` | `cmp`-identical, built against 0a875da |
+| registry check | `cargo horizon-mod check comforts.hmod` | **39,557 B**, SHA-256 `1bec3751abbdd259ada3e9cc10f1f02b1618209cd971e50b6c5a9e9293196bb9`, exit 0 |
+| fits the pin | `cargo horizon-mod fits comforts.hmod --build 0a875da` | `0a875da  made for`, exit 0 |
+| the gate | `python3 ports/tools/verify-sdk-package.py comforts` | 1/1 |
+| in game | `tools/e2e-dialect.sh` | `PASS` + `EXIT:0`; `SELFTEST=1` `FAIL` + `EXIT:1`; `check-e2e-logs.py comforts --strict` exit 0 |
+
+Changed: 1 recipe. Proof: sleeping_bed crafts 1; loot already correct (not touched); pre-fix red. Full record in [`notes.md`](notes.md) §"26.3 dialect sweep".
